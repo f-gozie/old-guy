@@ -15,7 +15,7 @@ app = FastAPI()
 app.state.limiter = limiter
 
 
-@app.get("/how-old/")
+@app.get("/howold/")
 @limiter.limit("3/second")
 def get_age(request: Request, dob: date) -> Any:
     """Get age, given a date of birth"""
