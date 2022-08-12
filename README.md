@@ -1,5 +1,7 @@
 # Backend Assessment
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/733ad7871de540679f38c7caf380a29b)](https://app.codacy.com/gh/f-gozie/old-guy?utm_source=github.com&utm_medium=referral&utm_content=f-gozie/old-guy&utm_campaign=Badge_Grade_Settings)
+
 Build and deploy a very simple API that does the following
 
 1.  Calculate and return the age of a person, given their date of birth (dob) as query parameters to `GET /howold`
