@@ -1,12 +1,15 @@
 from typing import Any
 from datetime import date
-
+import math
 from fastapi import FastAPI
+from fastapi.encoders import jsonable_encoder
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.exceptions import RequestValidationError
 from mangum import Mangum
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 from starlette.requests import Request
+from starlette.responses import JSONResponse
 
 from .utils import workers
 from .utils.validators import DateValidator
@@ -22,6 +25,17 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    try:
+        dob = float(request.query_params.get("dob"))
+        if math.isnan(dob):
+            return JSONResponse(status_code=400, content={"detail": "Invalid date format. Please use YYYY-MM-DD"})
+        return JSONResponse(status_code=422, content=jsonable_encoder({"detail": exc.errors()}))
+    except ValueError:
+        return JSONResponse(status_code=422, content=jsonable_encoder(exc.errors()))
 
 
 @app.get("/howold/")
