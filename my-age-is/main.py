@@ -30,12 +30,12 @@ app.add_middleware(
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     try:
-        dob = float(request.query_params.get("dob"))
+        dob = float(request.query_params.get("dob", ""))
         if math.isnan(dob):
-            return JSONResponse(status_code=400, content={"detail": "Invalid date format. Please use YYYY-MM-DD"})
-        return JSONResponse(status_code=422, content=jsonable_encoder({"detail": exc.errors()}))
+            return JSONResponse(status_code=400, content={"error": "Invalid date format. Please use YYYY-MM-DD"})
+        return JSONResponse(status_code=422, content=jsonable_encoder({"error": exc.errors()}))
     except ValueError:
-        return JSONResponse(status_code=422, content=jsonable_encoder(exc.errors()))
+        return JSONResponse(status_code=422, content=jsonable_encoder({"error": exc.errors()}))
 
 
 @app.get("/howold/")
