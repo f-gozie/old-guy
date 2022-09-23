@@ -33,9 +33,9 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         dob = float(request.query_params.get("dob", ""))
         if math.isnan(dob):
             return JSONResponse(status_code=400, content={"error": "Invalid date format. Please use YYYY-MM-DD"})
-        return JSONResponse(status_code=422, content=jsonable_encoder({"error": exc.errors()}))
+        return JSONResponse(status_code=400, content=jsonable_encoder({"error": exc.errors()[0]["msg"]}))
     except ValueError:
-        return JSONResponse(status_code=422, content=jsonable_encoder({"error": exc.errors()}))
+        return JSONResponse(status_code=400, content=jsonable_encoder({"error": exc.errors()[0]["msg"]}))
 
 
 @app.get("/howold/")
@@ -44,8 +44,11 @@ def get_age(request: Request, dob: date) -> Any:
     """Get age, given a date of birth"""
     validator = DateValidator(dob)
     validated_dob = validator.validate()
-    age = workers.calculate_age(validated_dob)
-    return age
+    if validated_dob[0]:
+        age = workers.calculate_age(validated_dob[1])
+        return age
+    else:
+        return JSONResponse(status_code=400, content={"error": validated_dob[1]})
 
 
 handler = Mangum(app)
